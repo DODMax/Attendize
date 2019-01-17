@@ -183,7 +183,7 @@ class EventCheckoutController extends Controller
         if (config('attendize.enable_dummy_payment_gateway') == TRUE) {
             $activeAccountPaymentGateway = new AccountPaymentGateway();
             $activeAccountPaymentGateway->fill(['payment_gateway_id' => config('attendize.payment_gateway_dummy')]);
-            $paymentGateway= $activeAccountPaymentGateway;
+            $paymentGateway = $activeAccountPaymentGateway;
         } else {
             $activeAccountPaymentGateway = $event->account->active_payment_gateway ? $event->account->active_payment_gateway->firstOrFail() : false;
             $paymentGateway = $event->account->active_payment_gateway ? $event->account->active_payment_gateway->payment_gateway : false;
@@ -671,6 +671,11 @@ class EventCheckoutController extends Controller
         DB::commit();
         //forget the order in the session
         session()->forget('ticket_order_' . $event->id);
+
+        /*
+         * Remove any tickets the user has reserved after they have been ordered for the user
+         */
+        ReservedTickets::where('session_id', '=', session()->getId())->delete();
 
         // Queue up some tasks - Emails to be sent, PDFs etc.
         Log::info('Firing the event');
