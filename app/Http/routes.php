@@ -41,16 +41,6 @@ Route::group(
         'as'   => 'logout',
     ]);
 
-
-    Route::get('/terms_and_conditions', [
-        'as' => 'termsAndConditions',
-        function () {
-            return 'TODO: add terms and cond';
-        }
-    ]);
-
-
-
     Route::group(['middleware' => ['installed']], function () {
 
         /*
@@ -326,28 +316,17 @@ Route::group(
                 ]
             );
 
-            Route::get('{event_id}', function ($event_id) {
-                return Redirect::route('showEventDashboard', [
-                    'event_id' => $event_id,
-                ]);
-            });
+            Route::get('{event_id}/', [
+                    'uses' => 'EventDashboardController@redirectToDashboard',
+                ]
+            );
 
             /*
              * @todo Move to a controller
              */
-            Route::get('{event_id}/go_live', [
-                'as' => 'MakeEventLive',
-                function ($event_id) {
-                    $event = \App\Models\Event::scope()->findOrFail($event_id);
-                    $event->is_live = 1;
-                    $event->save();
-                    \Session::flash('message',
-                        'Event Successfully Made Live! You can undo this action in event settings page.');
-
-                    return Redirect::route('showEventDashboard', [
-                        'event_id' => $event_id,
-                    ]);
-                }
+             Route::get('{event_id}/go_live', [
+                'as'   => 'MakeEventLive',
+                'uses' => 'EventController@makeEventLive',
             ]);
 
             /*
@@ -589,19 +568,6 @@ Route::group(
                 'uses' => 'EventCustomizeController@postEditEventFees',
             ]);
 
-            /**
-             * Event access codes
-             */
-            Route::get('{event_id}/access_codes/create', [
-                'as'   => 'showCreateEventAccessCode',
-                'uses' => 'EventAccessCodesController@showCreate',
-            ]);
-
-            Route::post('{event_id}/access_codes/create', [
-                'as'   => 'postCreateEventAccessCode',
-                'uses' => 'EventAccessCodesController@postCreate',
-            ]);
-
             /*
              * -------
              * Event Widget page
@@ -610,6 +576,31 @@ Route::group(
             Route::get('{event_id}/widgets', [
                 'as'   => 'showEventWidgets',
                 'uses' => 'EventWidgetsController@showEventWidgets',
+            ]);
+
+            /*
+             * -------
+             * Event Access Codes page
+             * -------
+             */
+            Route::get('{event_id}/access_codes', [
+                'as'   => 'showEventAccessCodes',
+                'uses' => 'EventAccessCodesController@show',
+            ]);
+
+            Route::get('{event_id}/access_codes/create', [
+                'as' => 'showCreateEventAccessCode',
+                'uses' => 'EventAccessCodesController@showCreate',
+            ]);
+
+            Route::post('{event_id}/access_codes/create', [
+                'as' => 'postCreateEventAccessCode',
+                'uses' => 'EventAccessCodesController@postCreate',
+            ]);
+
+            Route::post('{event_id}/access_codes/{access_code_id}/delete', [
+                'as' => 'postDeleteEventAccessCode',
+                'uses' => 'EventAccessCodesController@postDelete',
             ]);
 
             /*
@@ -709,18 +700,9 @@ Route::group(
         });
     });
 
-    Route::get('/', function () {
-        return Redirect::route('showSelectOrganiser');
-        // I prefer it that way:
-        // return Redirect::route('showOrganiserHome', ["organiser_id"=>1]);
-    });
-
-    Route::get('/terms_and_conditions', [
-        'as' => 'termsAndConditions',
-        function () {
-            return 'TODO: add terms and cond';
-        }
+    Route::get('/', [
+        'as'   => 'index',
+        'uses' => 'IndexController@showIndex',
     ]);
-
 });
 

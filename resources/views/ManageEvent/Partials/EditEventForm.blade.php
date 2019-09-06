@@ -5,6 +5,10 @@
 <div class="row">
     <div class="col-md-12">
         <div class="form-group">
+          {!! Form::label('currency_id', trans("ManageEvent.default_currency"), array('class'=>'control-label required')) !!}
+          {!! Form::select('currency_id', $currencies, $event->currency_id, ['class' => 'form-control']) !!}
+        </div>
+        <div class="form-group">
             {!! Form::label('is_live', trans("Event.event_visibility"), array('class'=>'control-label required')) !!}
             {!!  Form::select('is_live', [
             '1' => trans("Event.vis_public"),
@@ -183,6 +187,18 @@
                        {!!HTML::image('/'.$event->images->first()['image_path'])!!}
                     </div>
                     @endif
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {!! Form::label('google_tag_manager_code', trans("Organiser.google_tag_manager_code"), ['class'=>'control-label']) !!}
+                    {!!  Form::text('google_tag_manager_code', Input::old('google_tag_manager_code'), [
+                            'class'=>'form-control',
+                            'placeholder' => trans("Organiser.google_tag_manager_code_placeholder"),
+                        ])
+                    !!}
                 </div>
             </div>
         </div>
